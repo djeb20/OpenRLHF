@@ -79,6 +79,15 @@ class ActorPPOTrainer(ABC):
             ),
         )
 
+        ####### New Code #######
+        if getattr(self.args, 'constraints', None):
+            from openrlhf.models import ConstraintLoss
+            self.constraints = self.args.constraints
+            self.constraint_loss_fn = ConstraintLoss(self.constraints)
+        else:
+            self.constraints = None  
+        ########################      
+
         # Mixtral 8x7b
         self.aux_loss = self.args.aux_loss_coef > 1e-8
 
@@ -259,7 +268,15 @@ class ActorPPOTrainer(ABC):
         else:
             kl_loss = 0
 
-        loss = actor_loss + kl_loss * kl_ctl
+        ####### New Code #######
+        # Constraint losses
+        if self.constraints:
+            constraint_loss = self.constraint_loss_fn()
+            loss = actor_loss + kl_loss * kl_ctl + constraint_loss
+        else:
+            loss = actor_loss + kl_loss * kl_ctl
+        ########################
+
         # mixtral
         if self.aux_loss:
             loss += output.aux_loss * self.args.aux_loss_coef

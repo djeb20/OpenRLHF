@@ -13,6 +13,7 @@ from .loss import (
     VanillaKTOLoss,
 )
 from .model import get_llm_for_sequence_regression
+from .constraints import ConstraintLoss
 
 __all__ = [
     "Actor",
@@ -28,4 +29,5 @@ __all__ = [
     "ValueLoss",
     "VanillaKTOLoss",
     "get_llm_for_sequence_regression",
+    "ConstraintLoss",
 ]
